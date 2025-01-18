@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <div class="profile-container">
+        <h2>Welcome, {{ user.username }}</h2>
+
+        <div class="profile-info">
+            <img src="{{ avatar }}" alt="Avatar" class="profile-avatar">
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+        </div>
+
+        <a href="{% url 'logout' %}" class="logout-btn">Log Out</a>
+        <a href="" class="update-btn">Change Info</a>
+    </div>
+{% endblock %}

@@ -14,20 +14,32 @@
     <div class="wrapper">
         <header>
             <div class="header-title">
-                <img src="{% static 'images/PanPlateLogo.png' %}" class="site_icon">
+                <a href="/" class="icon_link"><img src="{% static 'images/PanPlateLogo.png' %}" class="site_icon"></a>
                 <input type="text" name="search" id="search-input" placeholder="Пошук..." class="search-bar" value="{{ search }}" oninput="submitSearch()">
-                <img src="{% static 'images/no_image.jpg' %}" class="avatar">
+                
+                <!-- Avatar and Dropdown -->
+                <div class="avatar-container">
+                    <img src="{% static 'images/no_image.jpg' %}" class="avatar" id="avatar">
+                    <div class="dropdown-menu" id="dropdown-menu" style="display: none;">
+                        {% if user.is_authenticated %}
+                            <button onclick="window.location.href='{% url 'profile' %}'">Profile</button>
+                            <button onclick="window.location.href='{% url 'logout' %}'">Log Out</button>
+                        {% else %}
+                            <button onclick="window.location.href='{% url 'login' %}'">Log In</button>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-        </header>
+        </header>        
         <main>
             <aside class="sidebar">
                 <div class="sidebar-div">
                     <nav class="sidebar-nav">
-                        <p class="nav-p"><a href="" class="nav-link">fyp</a></p>
+                        <p class="nav-p"><a href="/" class="nav-link">fyp</a></p>
                         <p class="nav-p"><a href="" class="nav-link">subscriptions</a></p>
                         <p class="nav-p"><a href="" class="nav-link">messages</a></p>
                         <p class="nav-p"><a href="" class="nav-link">groups</a></p>
-                        <p class="nav-p"><a href="" class="nav-link">profile</a></p>
+                        <p class="nav-p"><a href="{% url 'profile'%}" class="nav-link">profile</a></p>
                     </nav>
                 </div>
             </aside>
@@ -36,5 +48,23 @@
             {% endblock %}
         </main>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const avatar = document.getElementById("avatar");
+            const dropdownMenu = document.getElementById("dropdown-menu");
+    
+            avatar.addEventListener("click", () => {
+                const isVisible = dropdownMenu.style.display === "block";
+                dropdownMenu.style.display = isVisible ? "none" : "block";
+            });
+    
+            // Close dropdown when clicking outside
+            document.addEventListener("click", (event) => {
+                if (!avatar.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                    dropdownMenu.style.display = "none";
+                }
+            });
+        });
+    </script>    
 </body>
 </html>

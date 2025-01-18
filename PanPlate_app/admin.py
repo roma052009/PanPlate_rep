@@ -1,5 +1,5 @@
 from django.contrib import admin
-from PanPlate_app.models import Hashtag, Video, Recommendation, Notification, Message, Chat, Like, View, Comment, SavedVideo, Role, UserRole
+from PanPlate_app.models import Hashtag, Video, Recommendation, Notification, Message, Chat, Like, View, Comment, SavedVideo, Role, UserRole, UserAvatar
 
 
 admin.site.register(Hashtag)
@@ -12,6 +12,7 @@ admin.site.register(Like)
 admin.site.register(View)
 admin.site.register(Comment)
 admin.site.register(SavedVideo)
+admin.site.register(UserAvatar)
 
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
