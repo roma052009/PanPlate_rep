@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <title>{% block title %}PanPlate{% endblock %}</title>
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <div class="header-title">
+                <img src="{% static 'images/PanPlateLogo.png' %}" class="site_icon">
+                <input type="text" name="search" id="search-input" placeholder="Пошук..." class="search-bar" value="{{ search }}" oninput="submitSearch()">
+                <img src="{% static 'images/no_image.jpg' %}" class="avatar">
+            </div>
+        </header>
+        <main>
+            <aside class="sidebar">
+                <div class="sidebar-div">
+                    <nav class="sidebar-nav">
+                        <p class="nav-p"><a href="" class="nav-link">fyp</a></p>
+                        <p class="nav-p"><a href="" class="nav-link">subscriptions</a></p>
+                        <p class="nav-p"><a href="" class="nav-link">messages</a></p>
+                        <p class="nav-p"><a href="" class="nav-link">groups</a></p>
+                        <p class="nav-p"><a href="" class="nav-link">profile</a></p>
+                    </nav>
+                </div>
+            </aside>
+
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+</body>
+</html>

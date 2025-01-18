@@ -1,0 +1,84 @@
+.header-title {
+    margin: 0%;
+    height: 100%;
+    display: flex; /* Enable flexbox layout */
+    align-items: center; /* Vertically align items */
+    justify-content: space-between; /* Space out items to left and right */
+    width: 100%;
+    padding: 0 10px; /* Add some padding for spacing */
+    border: 1px solid;
+    border-color: #292929;
+}
+
+.site_icon {
+    margin: 0; /* Reset margins */
+    width: 4%; /* Size for the logo */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.search-bar {
+    width: 50%;
+    height: 20%;
+    margin: 0 10px; /* Add spacing around search bar */
+    padding: 5px; /* Inner padding for the input */
+    border-radius: 2vh;
+}
+
+.avatar {
+    margin: 0; /* Reset margins */
+    margin-right: 1%;
+    width: 4%; /* Size for the avatar */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+main {
+    display: flex; /* Flexbox for horizontal layout */
+    flex: 1; /* Main section fills the remaining height below header */
+    width: 100%; /* Full width */
+    height: 100%;
+    border: 1px solid;
+    border-color: #292929;
+}
+
+.sidebar {
+    padding-left: 2%;
+    padding-right: 10%;
+    padding-top: 1%;
+    width: 20%; /* Sidebar occupies 20% of the width */
+    height: 100%; /* Full height */
+    box-sizing: border-box; /* Include padding in the width/height */
+    display: flex; /* Enable vertical stacking */
+    flex-direction: column; /* Stack links vertically */
+    align-items: flex-start; /* Align items to the left */
+    border: 1px solid;
+    border-color: #292929;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    color: #333;
+    text-decoration: none;
+}
+
+.nav-p {
+    margin-bottom: 10px; /* Adds space between links */
+}
+
+body {
+    margin: 0%;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden
+}
+
+.wrapper {
+    height: 100%;
+    width: 100%;
+}
+
+header {
+    height: 10vh;
+    width: 100%;
+}

@@ -1,0 +1,22 @@
+from django.contrib import admin
+from PanPlate_app.models import Hashtag, Video, Recommendation, Notification, Message, Chat, Like, View, Comment, SavedVideo, Role, UserRole
+
+
+admin.site.register(Hashtag)
+admin.site.register(Video)
+admin.site.register(Recommendation)
+admin.site.register(Notification)
+admin.site.register(Message)
+admin.site.register(Chat)
+admin.site.register(Like)
+admin.site.register(View)
+admin.site.register(Comment)
+admin.site.register(SavedVideo)
+
+@admin.register(Role)
+class RoleAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description')
+
+@admin.register(UserRole)
+class UserRoleAdmin(admin.ModelAdmin):
+    list_display = ('user', 'role')
