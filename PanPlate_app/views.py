@@ -1,54 +1,148 @@
-from django.shortcuts import render, redirect
-from django.views.generic import ListView, View
-from PanPlate_app.models import Video, User, UserAvatar
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+from django.views.generic import ListView, DetailView, View
+from PanPlate_app.models import Video, User, UserAvatar, View_for_video, Comment, SavedVideo, Like
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from .forms import CommentForm
 from django.utils.timezone import now
 import random
+from django.db.models import Q
 
-class MainPageView(ListView):
-    model = Video
-    template_name = 'PanPlate_app/main_page.html'
-    context_object_name = 'videos'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+class MainPageView(View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
         videos = Video.objects.all()
-        if not videos.exists():
-            context['video'] = None
-            return context
+        
+        # Fetch avatar for the user if authenticated
+        avatar_path = "/media/avatars/no_image.jpg"
+        if user.is_authenticated:
+            try:
+                avatar_path = UserAvatar.objects.get(user=user).avatar.url
+            except UserAvatar.DoesNotExist:
+                pass
 
+        # Filter out videos the user has already watched
+        if user.is_authenticated:
+            watched_video_ids = View_for_video.objects.filter(user=user).values_list('video_id', flat=True)
+            unwatched_videos = videos.exclude(id__in=watched_video_ids)
+        else:
+            unwatched_videos = videos  # For unauthenticated users, show all videos
+
+        # If all videos are watched, select randomly; otherwise, use the unwatched ones
+        if unwatched_videos.exists():
+            videos_to_choose_from = unwatched_videos
+        else:
+            videos_to_choose_from = videos
+
+        # Handle the weighted random selection
         weights = []
         current_time = now()
-        for video in videos:
+        for video in videos_to_choose_from:
             age_in_days = (current_time - video.created_at).days + 1
             weight = 1 / age_in_days
             weights.append(weight)
 
         total_weight = sum(weights)
         normalized_weights = [w / total_weight for w in weights]
+        selected_video = random.choices(videos_to_choose_from, weights=normalized_weights, k=1)[0]
 
-        selected_video = random.choices(videos, weights=normalized_weights, k=1)[0]
-        context['video'] = selected_video
+        # Redirect to the VideoDetailView with the selected video's ID
+        return redirect('video_detail', video_id=selected_video.id)
+
+
+class VideoDetailView(DetailView):
+    model = Video
+    template_name = 'PanPlate_app/video_detail.html'
+    context_object_name = 'video'
+
+    def get_object(self, queryset=None):
+        # Get the video by the ID from the URL
+        video_id = self.kwargs.get('video_id')
+        return Video.objects.get(id=video_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        video = self.get_object()  # Get the video object
+
+        
+
+        # Add comments for the video to the context
+        comments = Comment.objects.filter(video=video)
+        comments_with_avatars = []
+
+        for comment in comments:
+            avatar_path = (
+                comment.user.useravatar.avatar.url
+                if hasattr(comment.user, 'useravatar') and comment.user.useravatar.avatar
+                else '/media/avatars/no_image.jpg'
+            )
+            comments_with_avatars.append({
+                'comment': comment,
+                'avatar': avatar_path,
+            })
+
+        context['comments_with_avatars'] = comments_with_avatars
+
+        # Fetch avatar for the user if authenticated
+        user = self.request.user
+        context['user'] = user
+        if user.is_authenticated:
+            # Create a view record if it doesn't exist
+            View_for_video.objects.get_or_create(user=user, video=video)
+        if user.is_authenticated:
+            try:
+                context['avatar'] = UserAvatar.objects.get(user=user).avatar.url
+            except UserAvatar.DoesNotExist:
+                context['avatar'] = "/media/avatars/no_image.jpg"
+            
+            # Add liked and saved status to context
+            context['liked'] = Like.objects.filter(user=user, video=video).exists()
+            context['saved'] = SavedVideo.objects.filter(user=user, video=video).exists()
+        else:
+            context['avatar'] = "/media/avatars/no_image.jpg"
+            context['liked'] = False
+            context['saved'] = False
+
         return context
+
+    def post(self, request, *args, **kwargs):
+        video_id = self.kwargs.get('video_id')
+        comment_text = request.POST.get('comment_text')
+
+        if comment_text:
+            video = Video.objects.get(id=video_id)
+            user = request.user
+
+            # Save the comment
+            Comment.objects.create(user=user, video=video, text=comment_text)
+
+        # Redirect to the same video detail page to display the new comment
+        return redirect('video_detail', video_id=video_id)
+
+
 
 class ProfileView(LoginRequiredMixin, View):
     template_name = 'PanPlate_app/profile.html'
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, user_id, *args, **kwargs):
+        # Get the user by user_id or return 404 if not found
+        user = get_object_or_404(User, id=user_id)
+
+        # Attempt to get the avatar for the user or default to a placeholder
         try:
-            avatar = UserAvatar.objects.get(user=request.user).avatar.url
-            print(avatar)
+            avatar = UserAvatar.objects.get(user=user).avatar.url
         except UserAvatar.DoesNotExist:
             avatar = "/media/avatars/no_image.jpg"  # Path to default avatar
 
+        # Pass the user and avatar to the template
         return render(request, self.template_name, {
-            'user': request.user,
+            'user': user,
             'avatar': avatar,
         })
-
 
 class LogoutView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
@@ -110,3 +204,102 @@ class SignUpView(View):
         login(request, user)
         
         return redirect('/')
+
+@login_required
+def save_video(request, video_id):
+    user = request.user
+    video = Video.objects.get(id=video_id)
+    if user.is_authenticated:
+        # Check if the video is already saved
+        saved_video, created = SavedVideo.objects.get_or_create(user=user, video_id=video_id)
+        if not created:
+            # If already saved, delete the save
+            saved_video.delete()
+    
+    View_for_video.objects.get_or_create(user=user, video=video)
+
+    return redirect('video_detail', video_id=video_id)  # Redirect to the video detail page
+
+@login_required
+def like_video(request, video_id):
+    user = request.user
+    if user.is_authenticated:
+        # Check if the user already liked the video
+        like, created = Like.objects.get_or_create(user=user, video_id=video_id)
+        if not created:
+            # If already liked, delete the like
+            like.delete()
+
+    return redirect('video_detail', video_id=video_id)  # Redirect to the video detail page
+
+class UpdateProfileView(View):
+    template_name = 'PanPlate_app/profile_change.html'
+
+    def get(self, request, user_id, *args, **kwargs):
+        # Get the user by user_id or return 404 if not found
+        user = get_object_or_404(User, id=user_id)
+
+        # Retrieve the avatar if it exists
+        avatar = user.useravatar.avatar.url if hasattr(user, 'useravatar') else "/media/avatars/no_image.jpg"
+
+        return render(request, self.template_name, {'user': user, 'avatar': avatar})
+
+    def post(self, request, user_id, *args, **kwargs):
+        user = get_object_or_404(User, id=user_id)
+
+        # Update username and email
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+
+        try:
+            # Ensure the username is unique
+            if User.objects.filter(username=username).exists() and user.username != username:
+                raise ValidationError("Username already exists.")
+
+            user.username = username
+            user.email = email
+
+            # Update avatar if a new one is uploaded
+            if request.FILES.get('avatar'):
+                avatar = request.FILES['avatar']
+                if not hasattr(user, 'useravatar'):
+                    user.useravatar = UserAvatar(user=user)
+                user.useravatar.avatar = avatar
+                user.useravatar.save()
+
+            user.save()
+
+            return redirect('profile', user_id=user.id)
+
+        except ValidationError as e:
+            return render(request, self.template_name, {'user': user, 'error': str(e)})
+        
+class AddVideoView(View):
+    template_name = 'PanPlate_app/add_video.html'
+
+    def get(self, request, user_id, *args, **kwargs):
+        # Get the user by user_id or return 404 if not found
+        user = get_object_or_404(User, id=user_id)
+        return render(request, self.template_name, {'user': user})
+
+    def post(self, request, user_id, *args, **kwargs):
+        user = get_object_or_404(User, id=user_id)
+
+        # Get form data
+        title = request.POST.get('title')
+        file = request.FILES.get('file')
+        thumbnail = request.FILES.get('thumbnail')
+
+        if title and file:
+            video = Video.objects.create(
+                title=title,
+                creator=user,
+                file=file,
+                thumbnail=thumbnail,
+            )
+            return redirect('video_detail', video_id=video.id)
+        else:
+            return render(request, self.template_name, {
+                'error': 'All fields are required.',
+                'user': user
+            })

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+<div class="main-container">
+    <!-- Video player -->
+    <video class="video" controls autoplay loop poster="{{ video.thumbnail.url }}">
+        <source src="{{ video.file.url }}" type="video/mp4">
+    </video>    
+    
+    <!-- Video title and creator -->
+    <div class="video-details">
+        <h2 class="video-title">{{ video.title }}</h2>
+        <p class="video-creator">By {{ video.creator }}</p>
+    </div>
+    <div class="right-side-content">
+    <!-- Navigation Buttons -->
+    <div class="video-navigation">
+        <a href="{% url 'save_video' video_id=video.id %}" 
+        class="interaction_btn save_btn {% if saved %}saved{% endif %}" 
+        title="Save" 
+        data-saved="{{ saved|yesno:'true,false' }}">
+        💾
+        </a>
+        <a href="{% url 'like_video' video_id=video.id %}" 
+        class="interaction_btn like_btn {% if liked %}liked{% endif %}" 
+        title="Like"
+        data-liked="{{ liked|yesno:'true,false' }}">
+        ❤️
+        </a>
+
+
+        <a href="" class="interaction_btn comment_btn" title="Comment">💬</a>
+        <a href="{% url 'main'%}" class="arrow_btn">↑</a>
+        <a href="{% url 'main'%}" class="arrow_btn">↓</a>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="comments_box" style="display: none;">
+        <div class="just_comments">
+            {% for item in comments_with_avatars %}
+            <div class="comment">
+                <!-- Display avatar and name -->
+                <div class="comment_header">
+                    <img src="{{ item.avatar }}" alt="User Avatar" class="comment_avatar">
+                    <b><span class="comment_name">{{ item.comment.user.username }}</span></b>
+                </div>
+                <!-- Display comment text -->
+                <div class="comment_text">{{ item.comment.text }}</div>
+            </div>
+            {% empty %}
+            <p>No comments yet. Be the first to comment!</p>
+            {% endfor %}
+        </div>
+
+        <!-- Comment Form -->
+        <form method="POST" action="{% url 'video_detail' video_id=video.id %}" class="comment_input_form">
+            {% csrf_token %}
+            <input type="hidden" name="video_id" value="{{ video.id }}">
+            <input type="text" name="comment_text" placeholder="Write a comment" class="comment_input" required>
+            <button type="submit" class="comment_submit">Post</button>
+        </form>
+    </div>
+    </div>
+    <!-- Script for Comments Toggle -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const commentButton = document.querySelector(".comment_btn");
+            const commentsBox = document.querySelector(".comments_box");
+            const likeButton = document.querySelector(".like_btn");
+            const saveButton = document.querySelector(".save_btn");
+    
+            // Function to toggle the comments visibility and button color
+            function toggleComments() {
+                const isVisible = commentsBox.style.display === "block";
+                commentsBox.style.display = isVisible ? "none" : "block";
+        
+                // Change comment button color based on visibility of the comments box
+                if (isVisible) {
+                    commentButton.style.backgroundColor = "#007bff"; // Color when comments are opened
+                } else {
+                    commentButton.style.backgroundColor = "#6c757d"; // Default color when closed
+                }
+            }
+        
+            // Toggle comments visibility and button color on click
+            commentButton.addEventListener("click", (event) => {
+                event.preventDefault(); // Prevent link default behavior
+                toggleComments();
+            });
+        
+            // Close comments when clicking outside
+            document.addEventListener("click", (event) => {
+                if (!commentsBox.contains(event.target) && !commentButton.contains(event.target)) {
+                    commentsBox.style.display = "none";
+                    commentButton.style.backgroundColor = "#007bff"; // Default color when closed
+                }
+            });
+    
+            // Get the like and save states from data attributes
+            const isLiked = likeButton.getAttribute('data-liked') === 'true';
+            const isSaved = saveButton.getAttribute('data-saved') === 'true';
+    
+            // Set like button color based on liked state
+            if (isLiked) {
+                likeButton.style.backgroundColor = "#28a745"; // Green when liked
+            } else {
+                likeButton.style.backgroundColor = "#007bff"; // Default color when not liked
+            }
+    
+            // Set save button color based on saved state
+            if (isSaved) {
+                saveButton.style.backgroundColor = "#ffc107"; // Yellow when saved
+            } else {
+                saveButton.style.backgroundColor = "#007bff"; // Default color when not saved
+            }
+        });
+    </script>
+    
+    
+</div>
+{% endblock %}

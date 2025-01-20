@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <div class="profile-container">
+        <h2>Add New Video</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="title">Video Title</label>
+                <input type="text" name="title" id="title" required>
+            </div>
+            <div class="form-group">
+                <label for="file">Video File</label>
+                <input type="file" name="file" id="file" required>
+            </div>
+            <div class="form-group">
+                <label for="thumbnail">Video Thumbnail</label>
+                <input type="file" name="thumbnail" id="thumbnail">
+            </div>
+            <button type="submit" class="add-video-btn">Add Video</button>
+        </form>
+
+        <!-- Cancel Button -->
+        <a href="{% url 'profile' user.id %}" class="cancel-btn">Cancel</a>
+    </div>
+{% endblock %}

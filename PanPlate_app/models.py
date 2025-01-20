@@ -66,7 +66,7 @@ class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
     video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name='likes')
 
-class View(models.Model):
+class View_for_video(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='views')
     video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name='views')
 
@@ -78,6 +78,16 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text[:50]
+
+class Like_for_comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='like_from')
+    liked_comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='liked_comment')
+
+    class Meta:
+        unique_together = ('user', 'liked_comment')  # Ensures a user can't subscribe to the same user twice
+
+    def __str__(self):
+        return f"{self.user.username} liked comment {self.liked_comment.text}"
 
 class SavedVideo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_videos')

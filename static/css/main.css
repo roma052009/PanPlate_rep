@@ -1,11 +1,11 @@
 .main-container {
     width: 100%;
+    height: 100vh; /* Ensures it takes up the full height of the viewport */
     display: flex;
-    justify-content: center; /* Centers items horizontally */
+    justify-content: space-between; /* Pushes video to center and other items to the right */
     align-items: center; /* Centers items vertically */
-    flex-direction: column; /* Stacks the content vertically */
-    height: 100%; /* Adjust based on your desired height */
-    position: relative; /* For positioning the overlay and navigation buttons */
+    flex-direction: row; /* Keeps items in a horizontal row */
+    position: relative; /* For positioning overlay and navigation buttons */
 }
 
 .video {
@@ -14,7 +14,16 @@
     max-height: 89%;
     width: auto;
     max-width: 100%; /* Ensures the video doesn't overflow horizontally */
+    flex-grow: 1; /* Ensures the video occupies space in the center */
 }
+
+.right-side-content {
+    display: flex;
+    flex-direction: row; /* Arrange items vertically */
+    justify-content: flex-start; /* Aligns items to the top of the container */
+    align-items: flex-end; /* Aligns items to the right side */
+}
+
 
 .video-details {
     position: absolute;
@@ -42,9 +51,7 @@
 }
 
 .video-navigation {
-    position: absolute;
     top: 50%; /* Centers the buttons vertically */
-    right: 10px; /* Positions the buttons near the right edge */
     transform: translateY(-50%); /* Corrects vertical alignment */
     display: flex;
     flex-direction: column; /* Aligns buttons vertically */
@@ -65,3 +72,57 @@
     z-index: 2; /* Ensures buttons stay above the video */
 }
 
+.interaction_btn {
+    height: 30px;
+    width: 30px;
+    text-decoration: none;
+    font-size: 1.5em;
+    padding: 10px;
+    background-color: #007bff; /* Example color */
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    display: inline-block;
+    z-index: 2; /* Ensures buttons stay above the video */
+}
+
+.comment_avatar {
+    margin: 0; /* Reset margins */
+    margin-right: 0%;
+    width: 4vh;
+    height: 4vh;
+    object-fit: cover; /* Ensures the image covers the container, cropping excess */
+    object-position: center; /* Centers the image in the container */
+    border-radius: 50%; /* Makes the image circular */
+    overflow: hidden; /* Ensures cropped parts aren't visible outside the container */
+}
+
+.comments_box {
+    height: 425px;
+    width: 250px;
+    overflow-y: auto;  /* Enables vertical scrolling */
+    border: 1px solid #ccc;  /* Optional: Add a border to visually define the box */
+    padding: 10px;  /* Optional: Add some padding inside the box */
+    background-color: #f9f9f9;  /* Optional: Set a background color */
+}
+
+.comment_input_form{
+    bottom: 50px;
+    position: fixed;
+}
+
+.comment_text {
+    max-width: 250px;  /* Set the maximum width */
+    word-wrap: break-word;  /* Forces the text to wrap when it exceeds the max-width */
+}
+
+.comment_header {
+    display: flex;  /* Aligns children horizontally */
+    align-items: flex-start;  /* Aligns items to the top */
+    gap: 10px;  /* Adds space between avatar and username */
+}
+
+.comment {
+    border: solid #ccc;
+    margin-bottom: 5px;
+}

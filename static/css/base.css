@@ -8,6 +8,7 @@
     padding: 0 10px; /* Add some padding for spacing */
     border: 1px solid;
     border-color: #292929;
+    background-color: #6d4c41;
 }
 
 .site_icon {
@@ -17,7 +18,8 @@
 }
 
 .icon_link {
-    width: 4%;
+    width: 8vh;
+    height: 8vh;
 }
 
 .search-bar {
@@ -26,15 +28,23 @@
     margin: 0 10px; /* Add spacing around search bar */
     padding: 5px; /* Inner padding for the input */
     border-radius: 2vh;
+    background-color: #8e735b;
+    color: white;
+}
+
+.search-bar::placeholder {
+    color: #f0e6d2; /* Light color for the placeholder text */
 }
 
 .avatar {
     margin: 0; /* Reset margins */
     margin-right: 0%;
-    width: 100%; /* Size for the avatar */
-    height: auto; /* Maintain aspect ratio */
-    border-radius: 50%;
-    overflow: hidden;
+    width: 100%; /* Set width to fill the container */
+    height: 100%; /* Set height to fill the container */
+    object-fit: cover; /* Ensures the image covers the container, cropping excess */
+    object-position: center; /* Centers the image in the container */
+    border-radius: 50%; /* Makes the image circular */
+    overflow: hidden; /* Ensures cropped parts aren't visible outside the container */
 }
 
 main {
@@ -47,9 +57,7 @@ main {
 }
 
 .sidebar {
-    padding-left: 2%;
-    padding-right: 10%;
-    padding-top: 1%;
+    padding: 0%;
     width: 20%; /* Sidebar occupies 20% of the width */
     height: 100%; /* Full height */
     box-sizing: border-box; /* Include padding in the width/height */
@@ -61,14 +69,56 @@ main {
     font-size: 1.5rem;
 }
 
-.nav-link {
-    color: #333;
-    text-decoration: none;
+.sidebar-div {
+    width: 100%;
+    height: 100%;
+}
+
+.sidebar-nav {
+    display: flex; /* Flexbox for easy alignment */
+    flex-direction: column; /* Stack links vertically */
+    gap: 15px; /* Adds spacing between each item */
+    padding: 15px; /* Inner padding for the sidebar */
+    background-color: #f7d9a4; /* Light golden color for pancakes */
+    border-radius: 0px; /* Rounded corners for the sidebar */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    width: auto; /* Full width */
+    height: 100%;
 }
 
 .nav-p {
-    margin-bottom: 10px; /* Adds space between links */
+    margin: 0; /* Reset default margins */
 }
+
+.nav-link {
+    display: block; /* Make the link occupy the full width */
+    color: #6d4c41; /* Rich brown for text */
+    text-decoration: none; /* Remove underline from links */
+    padding: 15px; /* Add padding around the link */
+    background-color: #f8e5c6; /* Light beige for background */
+    border-radius: 10px; /* Round the edges of the link */
+    font-size: 1.2rem; /* Slightly larger font for the links */
+    font-weight: bold; /* Bold text for emphasis */
+    text-align: center; /* Center-align the text */
+    transition: background-color 0.3s, color 0.3s; /* Smooth hover effect */
+}
+
+.nav-link:hover {
+    background-color: #d2a679; /* Toasted brown for hover */
+    color: #ffffff; /* White text on hover */
+}
+
+.nav-link:active {
+    background-color: #a26c3e; /* Dark syrup-like brown for active state */
+    color: #ffffff; /* Keep white text */
+}
+
+.sidebar-nav .active {
+    background-color: #edc68a; /* Warm pancake color for active link */
+    color: #8b5e3c; /* Toasted brown for active text */
+    font-weight: bold; /* Highlight active link with bold text */
+}
+
 
 body {
     margin: 0%;
@@ -90,7 +140,8 @@ header {
 .avatar-container {
     position: relative;
     display: inline-block;
-    width: 4%;
+    width: 8vh;
+    height: 8vh;
     margin-right: 1%;
 }
 
@@ -123,4 +174,13 @@ header {
 
 .dropdown-menu button:focus {
     outline: none; /* Remove the default focus outline */
+}
+
+.doesnt_work{
+    background-color: #292929;
+    color: #ccc;
+}
+
+.doesnt_work a:hover {
+    background-color: #292929;
 }

@@ -15,14 +15,14 @@
         <header>
             <div class="header-title">
                 <a href="/" class="icon_link"><img src="{% static 'images/PanPlateLogo.png' %}" class="site_icon"></a>
-                <input type="text" name="search" id="search-input" placeholder="Пошук..." class="search-bar" value="{{ search }}" oninput="submitSearch()">
+                <input type="text" name="search" id="search-input" placeholder="Search..." class="search-bar" value="{{ search }}" oninput="submitSearch()">
                 
                 <!-- Avatar and Dropdown -->
                 <div class="avatar-container">
-                    <img src="{% static 'images/no_image.jpg' %}" class="avatar" id="avatar">
+                    <img src="{{ avatar }}" class="avatar" id="avatar">
                     <div class="dropdown-menu" id="dropdown-menu" style="display: none;">
                         {% if user.is_authenticated %}
-                            <button onclick="window.location.href='{% url 'profile' %}'">Profile</button>
+                            <button onclick="window.location.href='{% url 'profile' user.id %}'">Profile</button> <!-- use user.id directly here -->
                             <button onclick="window.location.href='{% url 'logout' %}'">Log Out</button>
                         {% else %}
                             <button onclick="window.location.href='{% url 'login' %}'">Log In</button>
@@ -36,10 +36,16 @@
                 <div class="sidebar-div">
                     <nav class="sidebar-nav">
                         <p class="nav-p"><a href="/" class="nav-link">fyp</a></p>
-                        <p class="nav-p"><a href="" class="nav-link">subscriptions</a></p>
-                        <p class="nav-p"><a href="" class="nav-link">messages</a></p>
-                        <p class="nav-p"><a href="" class="nav-link">groups</a></p>
-                        <p class="nav-p"><a href="{% url 'profile'%}" class="nav-link">profile</a></p>
+                        <p class="nav-p"><a href="" class="nav-link doesnt_work">subscriptions</a></p>
+                        <p class="nav-p"><a href="" class="nav-link doesnt_work">messages</a></p>
+                        <p class="nav-p"><a href="" class="nav-link doesnt_work">groups</a></p>
+                        <p class="nav-p">
+                            {% if user.id %}
+                              <a href="{% url 'profile' user.id %}" class="nav-link">profile</a>
+                            {% else %}
+                              <a href="" class="nav-link">profile</a>
+                            {% endif %}
+                        </p>
                     </nav>
                 </div>
             </aside>

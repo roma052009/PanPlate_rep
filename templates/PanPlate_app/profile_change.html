@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <div class="profile-container">
+        <h2>Welcome, {{ user.username }}</h2>
+
+        <div class="profile-info">
+            <img src="{{ avatar }}" alt="Avatar" class="profile-avatar">
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+        </div>
+
+        <!-- Profile Change Form -->
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username" value="{{ user.username }}" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" value="{{ user.email }}" required>
+            </div>
+            <div class="form-group">
+                <label for="avatar">Change Avatar</label>
+                <input type="file" name="avatar" id="avatar">
+            </div>
+            <button type="submit" class="update-btn">Update Profile</button>
+        </form>
+
+        <!-- Cancel Button -->
+        <a href="{% url 'profile' user.id %}" class="cancel-btn">Cancel</a>
+
+        <a href="{% url 'logout' %}" class="logout-btn">Log Out</a>
+    </div>
+{% endblock %}
