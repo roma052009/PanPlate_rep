@@ -8,6 +8,7 @@
 }
 
 .profile-container {
+    width: 100%;
     text-align: center;
 }
 
@@ -37,4 +38,161 @@
 
 .add-video-btn:hover {
     background-color: #218838; /* Darker green on hover */
+}
+
+/* Tab buttons */
+.tab-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.tab-btn {
+    padding: 10px 15px;
+    border: none;
+    background-color: #ccc;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.tab-btn.active {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Hide content except active */
+.tab-content {
+    display: none;
+    margin-top: 15px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Video Grid */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Video Box Styling */
+.video-box {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.video-box:hover {
+    transform: scale(1.05);
+}
+
+.video-box video {
+    width: 100%;
+    height: 180px; /* Fixed height */
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+    .video-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .video-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+/* Video Grid */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Video Box */
+.video-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.video-box:hover {
+    transform: scale(1.05);
+}
+
+.video-box img {
+    width: 100%;
+    height: 180px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.video-box p {
+    margin-top: 8px;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .video-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .video-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+/* Ensure the entire page takes full height */
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* Prevents scrolling on the entire page */
+}
+
+/* Profile container (the scrollable area) */
+.profile-container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    height: 80vh; /* Takes 80% of the viewport height */
+    overflow-y: auto; /* Enables scrolling */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Optional: Customize scrollbar appearance */
+.profile-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.profile-container::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 5px;
+}
+
+.profile-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
 }

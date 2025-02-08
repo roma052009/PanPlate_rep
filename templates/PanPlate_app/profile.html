@@ -3,6 +3,7 @@
 
 {% block content %}
     <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+
     <div class="profile-container">
         <h2>Welcome, {{ user.username }}</h2>
 
@@ -14,8 +15,66 @@
 
         <a href="{% url 'logout' %}" class="logout-btn">Log Out</a>
         <a href="{% url 'profile_change' user_id=user.id %}" class="update-btn">Change Info</a>
-
-        <!-- Add Video Button -->
         <a href="{% url 'add_video' user_id=user.id %}" class="add-video-btn">Add Video</a>        
+
+        <!-- Tab Navigation -->
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="showTab('your-videos', this)">Your Videos</button>
+            <button class="tab-btn" onclick="showTab('liked-videos', this)">Liked</button>
+            <button class="tab-btn" onclick="showTab('saved-videos', this)">Saved</button>
+        </div>
+
+        <!-- Your Videos -->
+        <div id="your-videos" class="tab-content active">
+            <div class="video-grid">
+                {% for video in user_videos %}
+                    <a href="{% url 'video_detail' video_id=video.id %}" class="video-box">
+                        <img src="{{ video.thumbnail.url }}" alt="Thumbnail">
+                        <p>{{ video.title }}</p>
+                    </a>
+                {% empty %}
+                    <p>No videos uploaded yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Liked Videos -->
+        <div id="liked-videos" class="tab-content">
+            <div class="video-grid">
+                {% for like in liked_videos %}
+                    <a href="{% url 'video_detail' video_id=like.video.id %}" class="video-box">
+                        <img src="{{ like.video.thumbnail.url }}" alt="Thumbnail">
+                        <p>{{ like.video.title }}</p>
+                    </a>
+                {% empty %}
+                    <p>No liked videos yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Saved Videos -->
+        <div id="saved-videos" class="tab-content">
+            <div class="video-grid">
+                {% for saved in saved_videos %}
+                    <a href="{% url 'video_detail' video_id=saved.video.id %}" class="video-box">
+                        <img src="{{ saved.video.thumbnail.url }}" alt="Thumbnail">
+                        <p>{{ saved.video.title }}</p>
+                    </a>
+                {% empty %}
+                    <p>No saved videos yet.</p>
+                {% endfor %}
+            </div>
+        </div>
     </div>
+
+    <!-- JavaScript for Tabs -->
+    <script>
+        function showTab(tabId, button) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            button.classList.add('active');
+        }
+    </script>
 {% endblock %}

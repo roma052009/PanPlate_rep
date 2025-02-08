@@ -15,8 +15,8 @@ from django.db.models import Q
 class MainPageView(View):
     def get(self, request, *args, **kwargs):
         user = request.user
-        videos = Video.objects.all()
-        
+        videos = list(Video.objects.all())  # Convert queryset to a list for easier handling
+
         # Fetch avatar for the user if authenticated
         avatar_path = "/media/avatars/no_image.jpg"
         if user.is_authenticated:
@@ -25,33 +25,64 @@ class MainPageView(View):
             except UserAvatar.DoesNotExist:
                 pass
 
-        # Filter out videos the user has already watched
-        if user.is_authenticated:
-            watched_video_ids = View_for_video.objects.filter(user=user).values_list('video_id', flat=True)
-            unwatched_videos = videos.exclude(id__in=watched_video_ids)
+        # Retrieve navigation action (up or down)
+        action = request.GET.get("action")
+
+        # Retrieve video history from session
+        video_history = request.session.get("video_history", [])
+        current_index = request.session.get("current_index", -1)
+
+        if action == "up" and current_index > 0:
+            # Move to the previous video in the history list
+            current_index -= 1
+            selected_video_id = video_history[current_index]
+
+        elif action == "down":
+            if current_index < len(video_history) - 1:
+                # Move to the next video in the history list
+                current_index += 1
+                selected_video_id = video_history[current_index]
+            else:
+                # Choose a new random video and add it to history
+                watched_video_ids = View_for_video.objects.filter(user=user).values_list('video_id', flat=True) if user.is_authenticated else []
+                unwatched_videos = [v for v in videos if v.id not in watched_video_ids]
+
+                # Pick from unwatched videos if available, otherwise from all videos
+                videos_to_choose_from = unwatched_videos if unwatched_videos else videos
+
+                # Weighted selection
+                current_time = now()
+                weights = [1 / ((current_time - v.created_at).days + 1) for v in videos_to_choose_from]
+                selected_video = random.choices(videos_to_choose_from, weights=weights, k=1)[0]
+                selected_video_id = selected_video.id
+
+                # Update history list
+                video_history.append(selected_video_id)
+                current_index += 1
+
         else:
-            unwatched_videos = videos  # For unauthenticated users, show all videos
+            # First-time visit or no action → Choose a new random video
+            watched_video_ids = View_for_video.objects.filter(user=user).values_list('video_id', flat=True) if user.is_authenticated else []
+            unwatched_videos = [v for v in videos if v.id not in watched_video_ids]
+            videos_to_choose_from = unwatched_videos if unwatched_videos else videos
 
-        # If all videos are watched, select randomly; otherwise, use the unwatched ones
-        if unwatched_videos.exists():
-            videos_to_choose_from = unwatched_videos
-        else:
-            videos_to_choose_from = videos
+            # Weighted selection
+            current_time = now()
+            weights = [1 / ((current_time - v.created_at).days + 1) for v in videos_to_choose_from]
+            selected_video = random.choices(videos_to_choose_from, weights=weights, k=1)[0]
+            selected_video_id = selected_video.id
 
-        # Handle the weighted random selection
-        weights = []
-        current_time = now()
-        for video in videos_to_choose_from:
-            age_in_days = (current_time - video.created_at).days + 1
-            weight = 1 / age_in_days
-            weights.append(weight)
+            # Start new history
+            video_history = [selected_video_id]
+            current_index = 0
 
-        total_weight = sum(weights)
-        normalized_weights = [w / total_weight for w in weights]
-        selected_video = random.choices(videos_to_choose_from, weights=normalized_weights, k=1)[0]
+        # Save history back to session
+        request.session["video_history"] = video_history
+        request.session["current_index"] = current_index
+        request.session.modified = True
 
-        # Redirect to the VideoDetailView with the selected video's ID
-        return redirect('video_detail', video_id=selected_video.id)
+        return redirect("video_detail", video_id=selected_video_id)
+
 
 
 class VideoDetailView(DetailView):
@@ -68,7 +99,23 @@ class VideoDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         video = self.get_object()  # Get the video object
 
-        
+        def format_count(count):
+            if count >= 1_000_000:
+                return f"{count / 1_000_000:.1f}M"
+            elif count >= 1_000:
+                return f"{count / 1_000:.1f}K"
+            return str(count)
+
+        context['likes_count'] = format_count(video.likes.count())
+        context['saves_count'] = format_count(video.saved_by.count())
+        context['comments_count'] = format_count(video.comments.count())
+
+        try:
+            context['creator_avatar'] = video.creator.useravatar.avatar.url
+        except UserAvatar.DoesNotExist:
+            context['creator_avatar'] = "/media/avatars/no_image.jpg"
+        except AttributeError:
+            context['creator_avatar'] = "/media/avatars/no_image.jpg"
 
         # Add comments for the video to the context
         comments = Comment.objects.filter(video=video)
@@ -129,19 +176,25 @@ class ProfileView(LoginRequiredMixin, View):
     template_name = 'PanPlate_app/profile.html'
 
     def get(self, request, user_id, *args, **kwargs):
-        # Get the user by user_id or return 404 if not found
         user = get_object_or_404(User, id=user_id)
 
-        # Attempt to get the avatar for the user or default to a placeholder
+        # Get avatar or default
         try:
             avatar = UserAvatar.objects.get(user=user).avatar.url
         except UserAvatar.DoesNotExist:
-            avatar = "/media/avatars/no_image.jpg"  # Path to default avatar
+            avatar = "/media/avatars/no_image.jpg"
 
-        # Pass the user and avatar to the template
+        # Fetch user's uploaded, liked, and saved videos
+        user_videos = Video.objects.filter(creator=user)
+        liked_videos = Like.objects.filter(user=user).select_related('video')
+        saved_videos = SavedVideo.objects.filter(user=user).select_related('video')
+
         return render(request, self.template_name, {
             'user': user,
             'avatar': avatar,
+            'user_videos': user_videos,
+            'liked_videos': liked_videos,
+            'saved_videos': saved_videos,
         })
 
 class LogoutView(LoginRequiredMixin, View):

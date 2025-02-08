@@ -51,11 +51,12 @@
 }
 
 .video-navigation {
-    top: 50%; /* Centers the buttons vertically */
-    transform: translateY(-50%); /* Corrects vertical alignment */
+    text-align: center;
+    width: 100%;
     display: flex;
     flex-direction: column; /* Aligns buttons vertically */
     gap: 10px; /* Adds space between buttons */
+    padding: 10px;
 }
 
 .arrow_btn {
@@ -125,4 +126,11 @@
 .comment {
     border: solid #ccc;
     margin-bottom: 5px;
+}
+
+.c_avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%; /* Makes the image circular */
+    overflow: hidden;
 }

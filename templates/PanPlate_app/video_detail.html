@@ -17,23 +17,25 @@
     <div class="right-side-content">
     <!-- Navigation Buttons -->
     <div class="video-navigation">
-        <a href="{% url 'save_video' video_id=video.id %}" 
-        class="interaction_btn save_btn {% if saved %}saved{% endif %}" 
-        title="Save" 
-        data-saved="{{ saved|yesno:'true,false' }}">
-        💾
-        </a>
+        <img src="{{ creator_avatar }}" alt="User Avatar" class="c_avatar">
         <a href="{% url 'like_video' video_id=video.id %}" 
         class="interaction_btn like_btn {% if liked %}liked{% endif %}" 
         title="Like"
         data-liked="{{ liked|yesno:'true,false' }}">
         ❤️
         </a>
-
-
+        {{likes_count}}
         <a href="" class="interaction_btn comment_btn" title="Comment">💬</a>
-        <a href="{% url 'main'%}" class="arrow_btn">↑</a>
-        <a href="{% url 'main'%}" class="arrow_btn">↓</a>
+        {{comments_count}}
+        <a href="{% url 'save_video' video_id=video.id %}" 
+        class="interaction_btn save_btn {% if saved %}saved{% endif %}" 
+        title="Save" 
+        data-saved="{{ saved|yesno:'true,false' }}">
+        💾
+        </a>
+        {{saves_count}}
+        <a href="{% url 'main' %}?action=up" class="arrow_btn">↑</a>
+        <a href="{% url 'main' %}?action=down" class="arrow_btn">↓</a>
     </div>
 
     <!-- Comments Section -->
