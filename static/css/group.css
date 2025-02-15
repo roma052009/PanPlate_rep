@@ -181,3 +181,223 @@
     font-style: italic;
     text-align: center;
 }
+
+/* Group Container */
+.group-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Title */
+.group-title {
+    color: #333;
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+/* Group List */
+.group-list {
+    width: 100%;
+    list-style: none;
+    padding: 0;
+}
+
+/* Group Items */
+.group-item {
+    background: #f9f9f9;
+    margin: 10px 0;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s;
+}
+
+/* Hover Effect */
+.group-item:hover {
+    background: #e9ecef;
+}
+
+/* Group Links */
+.group-link {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    display: block;
+    padding: 8px 0;
+    transition: color 0.3s;
+}
+
+/* Hover Effect for Links */
+.group-link:hover {
+    color: #0056b3;
+}
+
+/* Empty Group Message */
+.group-empty {
+    color: #888;
+    font-style: italic;
+}
+
+/* Group Chat Container */
+.group-chat-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 40px auto;
+    margin-top: 5px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Group Chat Title */
+.group-chat-title {
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+/* Group Owner */
+.group-owner {
+    color: #555;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+/* Group Chat Box */
+.group-chat-box {
+    height: 350px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+}
+
+/* Group Message */
+.group-message {
+    margin-bottom: 15px;
+    padding: 12px;
+    background-color: #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Sent Message */
+.group-message.sent {
+    background-color: #d4edda;
+    text-align: right;
+}
+
+/* Received Message */
+.group-message.received {
+    background-color: #f8d7da;
+    text-align: left;
+}
+
+/* Message Sender */
+.message-sender {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Message Content */
+.message-content {
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* Message Timestamp */
+.message-timestamp {
+    font-size: 12px;
+    color: #888;
+}
+
+/* No Messages Text */
+.no-messages {
+    color: #888;
+    font-style: italic;
+}
+
+/* Group Chat Form */
+.group-chat-form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Group Chat Input */
+.group-chat-input {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    resize: none;
+}
+
+/* Send Button */
+.group-chat-btn {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+/* Send Button Hover */
+.group-chat-btn:hover {
+    background-color: #0056b3;
+}
+
+/* No Permission Text */
+.no-permission {
+    color: #f44336;
+    font-style: italic;
+    text-align: center;
+}
+
+/* Subscription Button */
+.subscr_link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+}
+
+/* Subscription Button Hover */
+.subscr_link:hover {
+    background-color: #0056b3;
+}
+
+/* Button when Subscribed */
+.subscr_link.subscribed {
+    background-color: #28a745;
+}
+
+.subscr_link.subscribed:hover {
+    background-color: #218838;
+}
+
+/* Button when Not Subscribed */
+.subscr_link.not-subscribed {
+    background-color: #007bff;
+}
+
+.subscr_link.not-subscribed:hover {
+    background-color: #0056b3;
+}

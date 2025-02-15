@@ -23,4 +23,6 @@ urlpatterns = [
     path('groups/', views.GroupListView.as_view(), name='group_list'),
     path('groups/<int:group_id>/', views.GroupChatView.as_view(), name='group_chat'),
     path('search/', views.SearchResultsView.as_view(), name='search_results'),
+    path('group/<int:pk>/', views.GroupDetailView.as_view(), name='group-detail'),
+    path('group/<int:group_id>/subscribe/', views.toggle_subscription, name='toggle-subscription'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

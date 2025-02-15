@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView, View
-from PanPlate_app.models import Video, User, UserAvatar, View_for_video, Comment, SavedVideo, Like, Subscription, Chat, Message
+from PanPlate_app.models import Video, User, UserAvatar, View_for_video, Comment, SavedVideo, Like, Subscription, Chat, Message, GroupMember
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
@@ -546,3 +546,35 @@ class SearchResultsView(View):
             'groups': groups,
             'avatar': avatar,
         })
+    
+class GroupDetailView(DetailView):
+    model = Group
+    template_name = 'PanPlate_app/group_detail.html'
+    context_object_name = 'group'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        group = context['group']
+
+        # Check if the user is a member of the group
+        is_member = GroupMember.objects.filter(group=group, user=self.request.user).exists()
+
+        # Add is_member and is_subscribed to the context
+        context['is_member'] = is_member
+        context['is_subscribed'] = is_member  # Assuming subscription status is tied to group membership
+
+        return context
+
+
+@login_required
+def toggle_subscription(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+    user = request.user
+
+    # Try to get the GroupMember entry; if it doesn't exist, create one
+    membership, created = GroupMember.objects.get_or_create(group=group, user=user)
+
+    if not created:
+        membership.delete()  # If the user is already a member, unsubscribe by deleting
+
+    return redirect('group-detail', pk=group.id)

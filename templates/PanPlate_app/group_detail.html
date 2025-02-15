@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/group.css' %}">
+
+    <div class="group-container">
+        <h2 class="group-title">{{ group.name }}</h2>
+
+        <div class="group-info">
+            <p><strong>Group Name:</strong> {{ group.name }}</p>
+            <p><strong>Description:</strong> {{ group.description }}</p>
+            <p><strong>Created on:</strong> {{ group.created_at }}</p>
+            <p><strong>Owner:</strong> {{ group.owner.username }}</p>
+        </div>
+
+        <!-- Subscription Link -->
+        <a href="{% url 'toggle-subscription' group_id=group.id %}" class="subscr_link" 
+           id="subscribe-btn"
+           data-subscribed="{{ subscribed|yesno:'true,false' }}">
+           Subscribe
+        </a>
+    </div>
+
+    <!-- JavaScript for Subscription Toggle -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const subscLink = document.querySelector(".subscr_link");
+
+            function updateSubscriptionLink(subscribed) {
+                if (subscribed) {
+                    subscLink.style.backgroundColor = "#28a745"; // Green when subscribed
+                    subscLink.textContent = "Subscribed";
+                } else {
+                    subscLink.style.backgroundColor = "#007bff"; // Blue when not subscribed
+                    subscLink.textContent = "Subscribe";
+                }
+            }
+
+            // Get initial subscription state
+            let isSubscribed = subscLink.getAttribute('data-subscribed') === 'true';
+            updateSubscriptionLink(isSubscribed);
+
+            // Toggle subscription state on click
+            subscLink.addEventListener("click", (event) => {
+                event.preventDefault();  // Prevent default link behavior
+                
+                fetch(subscLink.href, { method: "GET" })  // Send request to subscribe/unsubscribe
+                    .then(response => {
+                        if (response.ok) {
+                            isSubscribed = !isSubscribed;
+                            subscLink.setAttribute('data-subscribed', isSubscribed);
+                            updateSubscriptionLink(isSubscribed);
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+            });
+        });
+    </script>
+{% endblock %}

@@ -49,12 +49,13 @@
         <h3>Groups</h3>
         <ul class="result-list">
             {% for group in groups %}
-                <li><a href="">{{ group.name }}</a></li>
+                <li><a href="{% url 'group-detail' group.pk %}">{{ group.name }}</a></li>
             {% empty %}
                 <li>No groups found.</li>
             {% endfor %}
         </ul>
     </div>
+    
 </div>
 
 <!-- JavaScript for Tabs -->
