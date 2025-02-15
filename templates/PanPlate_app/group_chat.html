@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/group.css' %}">
+
+<div class="group-chat-container">
+    <h2 class="group-chat-title">Chat: {{ group.name }}</h2>
+    <p class="group-owner"><strong>Owner:</strong> {{ group.owner.username }}</p>
+
+    <div class="group-chat-box">
+        {% for message in messages %}
+            <div class="group-message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                <strong class="message-sender">{{ message.sender.username }}:</strong>
+                <p class="message-content">{{ message.content }}</p>
+                <span class="message-timestamp">{{ message.created_at|date:"H:i" }}</span>
+            </div>
+        {% empty %}
+            <p class="no-messages">No messages yet.</p>
+        {% endfor %}
+    </div>
+
+    {% if group.owner == request.user %}
+        <form method="post" class="group-chat-form">
+            {% csrf_token %}
+            <textarea name="content" rows="3" class="group-chat-input" placeholder="Type your message..." required></textarea>
+            <button type="submit" class="group-chat-btn">Send</button>
+        </form>
+    {% else %}
+        <p class="no-permission">You are not the owner of this group. You cannot send messages.</p>
+    {% endif %}
+</div>
+{% endblock %}

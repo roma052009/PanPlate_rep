@@ -12,7 +12,7 @@
     text-align: center;
 }
 
-.logout-btn, .update-btn {
+.logout-btn, .update-btn, .subscr_link {
     display: inline-block;
     margin-top: 20px;
     padding: 10px 20px;

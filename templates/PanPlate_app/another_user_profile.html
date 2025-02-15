@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+
+    <div class="profile-container">
+        <h2>{{ profile_user.username }}</h2>
+
+        <div class="profile-info">
+            <img src="{{ profile_user_avatar }}" alt="Avatar" class="profile-avatar">
+            <p><strong>Username:</strong> {{ profile_user.username }}</p>
+            <p><strong>Email:</strong> {{ profile_user.email }}</p>
+        </div>
+
+        <!-- Subscription Link -->
+        <a href="{% url 'subscribe' creator_id=profile_user.id %}" class="subscr_link" 
+           data-subscribed="{{ subscribed|yesno:'true,false' }}">
+            Subscribe
+        </a>
+
+        <!-- Tab Navigation -->
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="showTab('your-videos', this)">User Videos</button>
+        </div>
+
+        <!-- Your Videos -->
+        <div id="your-videos" class="tab-content active">
+            <div class="video-grid">
+                {% for video in user_videos %}
+                    <a href="{% url 'video_detail' video_id=video.id %}" class="video-box">
+                        <img src="{{ video.thumbnail.url }}" alt="Thumbnail">
+                        <p>{{ video.title }}</p>
+                    </a>
+                {% empty %}
+                    <p>No videos uploaded yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+    <!-- JavaScript for Subscription Toggle -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const subscLink = document.querySelector(".subscr_link");
+
+            function updateSubscriptionLink(subscribed) {
+                if (subscribed) {
+                    subscLink.style.backgroundColor = "#28a745"; // Green when subscribed
+                    subscLink.textContent = "Subscribed";
+                } else {
+                    subscLink.style.backgroundColor = "#007bff"; // Blue when not subscribed
+                    subscLink.textContent = "Subscribe";
+                }
+            }
+
+            // Get initial subscription state
+            let isSubscribed = subscLink.getAttribute('data-subscribed') === 'true';
+            updateSubscriptionLink(isSubscribed);
+
+            // Toggle subscription state on click
+            subscLink.addEventListener("click", (event) => {
+                event.preventDefault();  // Prevent default link behavior
+                
+                fetch(subscLink.href, { method: "GET" })  // Send request to subscribe/unsubscribe
+                    .then(response => {
+                        if (response.ok) {
+                            isSubscribed = !isSubscribed;
+                            subscLink.setAttribute('data-subscribed', isSubscribed);
+                            updateSubscriptionLink(isSubscribed);
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+            });
+        });
+    </script>
+{% endblock %}

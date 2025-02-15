@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/group.css' %}">
+
+<div class="group-container">
+    <h2 class="group-title">Your Groups</h2>
+    <ul class="group-list">
+        {% for group in groups %}
+            <li class="group-item">
+                <a href="{% url 'group_chat' group.id %}" class="group-link">{{ group.name }}</a>
+            </li>
+        {% empty %}
+            <li class="group-empty">No groups available.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

@@ -36,9 +36,9 @@
                 <div class="sidebar-div">
                     <nav class="sidebar-nav">
                         <p class="nav-p"><a href="/" class="nav-link">fyp</a></p>
-                        <p class="nav-p"><a href="" class="nav-link doesnt_work">subscriptions</a></p>
-                        <p class="nav-p"><a href="" class="nav-link doesnt_work">messages</a></p>
-                        <p class="nav-p"><a href="" class="nav-link doesnt_work">groups</a></p>
+                        <p class="nav-p"><a href="{% url 'subscriptions_list' %}" class="nav-link">subscriptions</a></p>
+                        <p class="nav-p"><a href="{% url 'chat_list' %}" class="nav-link">messages</a></p>
+                        <p class="nav-p"><a href="{% url 'group_list' %}" class="nav-link">groups</a></p>
                         <p class="nav-p">
                             {% if user.id %}
                               <a href="{% url 'profile' user.id %}" class="nav-link">profile</a>

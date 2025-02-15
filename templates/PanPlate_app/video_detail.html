@@ -17,7 +17,7 @@
     <div class="right-side-content">
     <!-- Navigation Buttons -->
     <div class="video-navigation">
-        <img src="{{ creator_avatar }}" alt="User Avatar" class="c_avatar">
+        <a href="{% url 'another_user_profile' user_id=video.creator.id %}"><img src="{{ creator_avatar }}" alt="User Avatar" class="c_avatar"></a>
         <a href="{% url 'like_video' video_id=video.id %}" 
         class="interaction_btn like_btn {% if liked %}liked{% endif %}" 
         title="Like"

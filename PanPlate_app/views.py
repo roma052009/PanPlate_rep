@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView, View
-from PanPlate_app.models import Video, User, UserAvatar, View_for_video, Comment, SavedVideo, Like
+from PanPlate_app.models import Video, User, UserAvatar, View_for_video, Comment, SavedVideo, Like, Subscription, Chat, Message
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
@@ -196,6 +196,38 @@ class ProfileView(LoginRequiredMixin, View):
             'liked_videos': liked_videos,
             'saved_videos': saved_videos,
         })
+    
+class AnotherProfileView(View):
+    template_name = 'PanPlate_app/another_user_profile.html'
+
+    def get(self, request, user_id, *args, **kwargs):
+        user = get_object_or_404(User, id=user_id)
+        try:
+            own_avatar = UserAvatar.objects.get(user=self.request.user).avatar.url
+        except:
+            own_avatar = "/media/avatars/no_image.jpg"
+
+        # Get avatar or default
+        try:
+            avatar = UserAvatar.objects.get(user=user).avatar.url
+        except UserAvatar.DoesNotExist:
+            avatar = "/media/avatars/no_image.jpg"
+
+        # Fetch user's uploaded videos
+        user_videos = Video.objects.filter(creator=user)
+
+        # Check subscription status safely
+        subscribed = False
+        if request.user.is_authenticated:
+            subscribed = Subscription.objects.filter(user=request.user, subscribed_to=user).exists()
+
+        return render(request, self.template_name, {
+            'profile_user': user,
+            'profile_user_avatar': avatar,
+            'avatar': own_avatar,
+            'user_videos': user_videos,
+            'subscribed': subscribed,
+        })
 
 class LogoutView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
@@ -285,6 +317,18 @@ def like_video(request, video_id):
 
     return redirect('video_detail', video_id=video_id)  # Redirect to the video detail page
 
+@login_required
+def subscribe(request, creator_id):
+    user = request.user
+    creator = get_object_or_404(User, id=creator_id)
+
+    subscription, created = Subscription.objects.get_or_create(user=user, subscribed_to=creator)
+
+    if not created:
+        subscription.delete()  # Delete the specific instance if already subscribed
+
+    return redirect('another_user_profile', user_id=creator_id)
+
 class UpdateProfileView(View):
     template_name = 'PanPlate_app/profile_change.html'
 
@@ -356,3 +400,128 @@ class AddVideoView(View):
                 'error': 'All fields are required.',
                 'user': user
             })
+        
+class SubscriptionListView(LoginRequiredMixin, ListView):
+    model = Subscription
+    template_name = 'PanPlate_app/subscriptions.html'
+    context_object_name = 'subscriptions'
+
+    def get_queryset(self):
+        # Only return subscriptions for the logged-in user
+        return Subscription.objects.filter(user=self.request.user)
+    
+    def get_context_data(self, **kwargs):
+        # Get the default context
+        context = super().get_context_data(**kwargs)
+        
+        # Get the user's avatar (assuming the model has a OneToOneField for User)
+        try:
+            avatar = UserAvatar.objects.get(user=self.request.user).avatar.url
+        except UserAvatar.DoesNotExist:
+            avatar = "/media/avatars/no_image.jpg"
+
+        # Add avatar to context
+        context['avatar'] = avatar
+        
+        return context
+
+class ChatListView(LoginRequiredMixin, View):
+    def get(self, request):
+        chats = Chat.objects.filter(participants=request.user)
+        
+        # Fetch user avatar
+        try:
+            avatar = UserAvatar.objects.get(user=request.user).avatar.url
+        except UserAvatar.DoesNotExist:
+            avatar = "/media/avatars/no_image.jpg"
+        
+        return render(request, 'PanPlate_app/chat_list.html', {'chats': chats, 'avatar': avatar})
+
+class ChatCreateView(LoginRequiredMixin, View):
+    def get(self, request):
+        user = request.user
+
+        # Find users who are mutually subscribed
+        mutual_subscribers = User.objects.filter(
+            id__in=Subscription.objects.filter(user=user).values_list('subscribed_to', flat=True)
+        ).filter(
+            id__in=Subscription.objects.filter(subscribed_to=user).values_list('user', flat=True)
+        )
+
+        # Fetch user avatar
+        try:
+            avatar = UserAvatar.objects.get(user=user).avatar.url
+        except UserAvatar.DoesNotExist:
+            avatar = "/media/avatars/no_image.jpg"
+
+        return render(request, 'PanPlate_app/chat_create.html', {'users': mutual_subscribers, 'avatar': avatar})
+
+    def post(self, request):
+        user_ids = request.POST.getlist('participants')  # Get selected users
+
+        if not user_ids:
+            return redirect('chat_list')  # If no user is selected, go back
+
+        chat = Chat.objects.create()
+        chat.participants.add(request.user, *User.objects.filter(id__in=user_ids))
+        return redirect('chat_list')
+
+class ChatDetailView(LoginRequiredMixin, View):
+    def get(self, request, chat_id):
+        chat = get_object_or_404(Chat, id=chat_id, participants=request.user)
+        messages = chat.messages.order_by('created_at')  # Oldest messages first
+
+        # Fetch user avatar
+        try:
+            avatar = UserAvatar.objects.get(user=request.user).avatar.url
+        except UserAvatar.DoesNotExist:
+            avatar = "/media/avatars/no_image.jpg"
+
+        return render(request, 'PanPlate_app/chat_detail.html', {'chat': chat, 'messages': messages, 'avatar': avatar})
+
+    def post(self, request, chat_id):
+        chat = get_object_or_404(Chat, id=chat_id, participants=request.user)
+        text = request.POST.get('message')
+
+        if text.strip():  # Prevent empty messages
+            Message.objects.create(chat=chat, sender=request.user, text=text)
+
+        return redirect('chat_detail', chat_id=chat.id)
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views import View
+from .models import Group, GroupMessage
+
+class GroupListView(LoginRequiredMixin, View):
+    def get(self, request):
+        try:
+            avatar = UserAvatar.objects.get(user=request.user).avatar.url
+        except UserAvatar.DoesNotExist:
+            avatar = "/media/avatars/no_image.jpg"
+        groups = Group.objects.filter(memberships__user=request.user)
+        return render(request, 'PanPlate_app/group_list.html', {'groups': groups, 'avatar': avatar})
+
+class GroupChatView(LoginRequiredMixin, View):
+    def get(self, request, group_id):
+        group = get_object_or_404(Group, id=group_id)
+        messages = group.messages.all()
+        try:
+            avatar = UserAvatar.objects.get(user=request.user).avatar.url
+        except UserAvatar.DoesNotExist:
+            avatar = "/media/avatars/no_image.jpg"
+        return render(request, 'PanPlate_app/group_chat.html', {
+            'group': group,
+            'messages': messages,
+            'avatar': avatar
+        })
+
+    def post(self, request, group_id):
+        group = get_object_or_404(Group, id=group_id)
+
+        if group.owner == request.user:
+            content = request.POST.get("content", "").strip()
+            if content:
+                GroupMessage.objects.create(group=group, sender=request.user, content=content)
+
+        return redirect('group_chat', group_id=group.id)

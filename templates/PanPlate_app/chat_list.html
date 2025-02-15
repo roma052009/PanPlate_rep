@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+
+<div class="chat-container">
+    <h2 class="chat-title">Your Chats</h2>
+    <a href="{% url 'chat_create' %}" class="chat-btn">Create New Chat</a>
+    <ul class="chat-list">
+        {% for chat in chats %}
+            <li class="chat-item">
+                <a href="{% url 'chat_detail' chat.id %}" class="chat-link">
+                    Chat with 
+                    {% for user in chat.participants.all %}
+                        {% if user != request.user %}
+                            <span class="chat-user">{{ user.username }}</span>
+                        {% endif %}
+                    {% endfor %}
+                </a>
+            </li>
+        {% empty %}
+            <li class="chat-empty">No chats available.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

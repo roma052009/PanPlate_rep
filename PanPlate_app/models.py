@@ -123,3 +123,32 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f"{self.user.username} subscribed to {self.subscribed_to.username}"
+    
+class Group(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_groups')
+
+    def __str__(self):
+        return self.name
+    
+class GroupMember(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='memberships')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_memberships')
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('group', 'user')  # Prevent duplicate memberships
+
+    def __str__(self):
+        return f"{self.user.username} in {self.group.name}"
+
+class GroupMessage(models.Model):
+    group = models.ForeignKey('Group', on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_messages')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message from {self.sender.username} in {self.group.name}"

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+
+<div class="chat-container">
+    <h2 class="chat-header">Chat with 
+        {% for user in chat.participants.all %}
+            {% if user != request.user %}
+                <span class="chat-user">{{ user.username }}</span>
+            {% endif %}
+        {% endfor %}
+    </h2>
+
+    <div class="chat-box">
+        {% for message in messages %}
+            <div class="chat-message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                <strong class="message-sender">{{ message.sender.username }}:</strong>
+                <p class="message-text">{{ message.text }}</p>
+                <span class="message-timestamp">{{ message.created_at|date:"H:i" }}</span>
+            </div>
+        {% empty %}
+            <p class="no-messages">No messages yet.</p>
+        {% endfor %}
+    </div>
+
+    <form method="POST" class="chat-form">
+        {% csrf_token %}
+        <input type="text" name="message" class="chat-input" placeholder="Type a message..." required>
+        <button type="submit" class="chat-btn">Send</button>
+    </form>
+
+    <a href="{% url 'chat_list' %}" class="chat-back-btn">Back to Chats</a>
+</div>
+{% endblock %}

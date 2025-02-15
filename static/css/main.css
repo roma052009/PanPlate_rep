@@ -52,7 +52,7 @@
 
 .video-navigation {
     text-align: center;
-    width: 100%;
+    width: auto;
     display: flex;
     flex-direction: column; /* Aligns buttons vertically */
     gap: 10px; /* Adds space between buttons */
@@ -100,7 +100,7 @@
 
 .comments_box {
     height: 425px;
-    width: 250px;
+    width: 300px;
     overflow-y: auto;  /* Enables vertical scrolling */
     border: 1px solid #ccc;  /* Optional: Add a border to visually define the box */
     padding: 10px;  /* Optional: Add some padding inside the box */
@@ -108,7 +108,7 @@
 }
 
 .comment_input_form{
-    bottom: 50px;
+    bottom: 20px;
     position: fixed;
 }
 

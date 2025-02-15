@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/subscriptions.css' %}">
+    <div class="subscriptions-container">
+        <h1 class="title">Your Subscriptions</h1>
+        <ul class="subscriptions-list">
+            {% for subscription in subscriptions %}
+                <li class="subscription-item">
+                    <a href="{% url 'another_user_profile' subscription.subscribed_to.id %}">
+                    {{ subscription.subscribed_to.username }}
+                    </a>
+                </li>
+            {% empty %}
+                <p class="no-subscriptions">You are not subscribed to anyone.</p>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
