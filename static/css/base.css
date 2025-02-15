@@ -23,7 +23,7 @@
 }
 
 .search-bar {
-    width: 50%;
+    width: 600px;
     height: 20%;
     margin: 0 10px; /* Add spacing around search bar */
     padding: 5px; /* Inner padding for the input */

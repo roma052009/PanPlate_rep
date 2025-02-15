@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/search.css' %}">
+
+<div class="container">
+    <h2>Search Results for "{{ query }}"</h2>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-button active" onclick="openTab('videos', this)">Videos</button>
+        <button class="tab-button" onclick="openTab('people', this)">People</button>
+        <button class="tab-button" onclick="openTab('groups', this)">Groups</button>
+    </div>
+
+    <!-- Video Results -->
+    <div class="tab-content active" id="videos">
+        <h3>Videos</h3>
+        <div class="video-grid">
+            {% for video in videos %}
+                <div class="video-box">
+                    <a href="{% url 'video_detail' video.id %}">
+                        <img src="{{ video.thumbnail.url }}" alt="Thumbnail" class="video-thumbnail">
+                        <p>{{ video.title }}</p>
+                    </a>
+                    <p>By: <a href="{% url 'profile' video.creator.id %}">{{ video.creator.username }}</a></p>
+                </div>
+            {% empty %}
+                <p>No videos found.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- People Results -->
+    <div class="tab-content" id="people">
+        <h3>People</h3>
+        <ul class="result-list">
+            {% for person in people %}
+                <li><a href="{% url 'another_user_profile' person.id %}">{{ person.username }}</a></li>
+            {% empty %}
+                <li>No people found.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Group Results -->
+    <div class="tab-content" id="groups">
+        <h3>Groups</h3>
+        <ul class="result-list">
+            {% for group in groups %}
+                <li><a href="">{{ group.name }}</a></li>
+            {% empty %}
+                <li>No groups found.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- JavaScript for Tabs -->
+<script>
+    function openTab(tabName, button) {
+        document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+        document.getElementById(tabName).classList.add("active");
+
+        document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+    }
+</script>
+
+{% endblock %}

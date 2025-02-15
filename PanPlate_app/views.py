@@ -525,3 +525,24 @@ class GroupChatView(LoginRequiredMixin, View):
                 GroupMessage.objects.create(group=group, sender=request.user, content=content)
 
         return redirect('group_chat', group_id=group.id)
+
+class SearchResultsView(View):
+    def get(self, request):
+        query = request.GET.get('q', '')
+        try:
+            avatar = UserAvatar.objects.get(user=request.user).avatar.url
+        except UserAvatar.DoesNotExist:
+            avatar = "/media/avatars/no_image.jpg"
+        groups = Group.objects.filter(memberships__user=request.user)
+
+        videos = Video.objects.filter(title__icontains=query) if query else []
+        people = User.objects.filter(username__icontains=query) if query else []
+        groups = Group.objects.filter(name__icontains=query) if query else []
+
+        return render(request, 'PanPlate_app/search_results.html', {
+            'query': query,
+            'videos': videos,
+            'people': people,
+            'groups': groups,
+            'avatar': avatar,
+        })

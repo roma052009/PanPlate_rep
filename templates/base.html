@@ -15,7 +15,10 @@
         <header>
             <div class="header-title">
                 <a href="/" class="icon_link"><img src="{% static 'images/PanPlateLogo.png' %}" class="site_icon"></a>
-                <input type="text" name="search" id="search-input" placeholder="Search..." class="search-bar" value="{{ search }}" oninput="submitSearch()">
+                <form action="{% url 'search_results' %}" method="GET">
+                    <input type="text" name="q" id="search-input" placeholder="Search..." class="search-bar" value="{{ request.GET.q }}">
+                    <button type="submit" style="display: none;"></button>
+                </form>                
                 
                 <!-- Avatar and Dropdown -->
                 <div class="avatar-container">

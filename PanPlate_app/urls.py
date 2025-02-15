@@ -22,4 +22,5 @@ urlpatterns = [
     path('chats/<int:chat_id>/', views.ChatDetailView.as_view(), name='chat_detail'),
     path('groups/', views.GroupListView.as_view(), name='group_list'),
     path('groups/<int:group_id>/', views.GroupChatView.as_view(), name='group_chat'),
+    path('search/', views.SearchResultsView.as_view(), name='search_results'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
